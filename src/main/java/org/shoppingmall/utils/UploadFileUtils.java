@@ -24,9 +24,6 @@ public class UploadFileUtils {
 		
 		File target = new File(imgPath, newFileName);
 		FileCopyUtils.copy(fileData, target);
-		//fileData를 지정한 target에 복사.
-		//FileCopyUtils : 파일 및 스트림 복사를 위한 유틸리티 메소드 집합체
-		//사용후에 스트림을 무조건 닫음.
 		
 		String thumbFileName = "s_" + newFileName;
 		
