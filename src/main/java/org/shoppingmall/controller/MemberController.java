@@ -61,7 +61,6 @@ public class MemberController {
 			rttr.addFlashAttribute("msg", false);
 			return "redirect:/member/signin";
 			}
-		//--------------------------아이디 실패시---------------
 		
 		boolean passMatch = passEncoder.matches(vo.getUserPass(), login.getUserPass());
 		
@@ -71,11 +70,9 @@ public class MemberController {
 		else {
 			session.setAttribute("member", null);
 			rttr.addFlashAttribute("msg", false);
-			//redirect 시 같이 전달해줌.
 			return "redirect:/member/signin";
 		}
 		return "redirect:/";
-				//내부적으로 response.sendRedirect()를 처리해줌.
 	}
 	
 	@GetMapping("/signin")
