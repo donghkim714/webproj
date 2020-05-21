@@ -29,10 +29,8 @@ public class UploadFileUtils {
 		//사용후에 스트림을 무조건 닫음.
 		
 		String thumbFileName = "s_" + newFileName;
-									//uid + fileName
 		
 		File image = new File(imgPath + "/" + newFileName);
-										//\\의 의미
 		File thumbnail = new File(imgPath + "/" + "s" + "/" + thumbFileName);
 		
 		if(image.exists()) {
@@ -43,14 +41,11 @@ public class UploadFileUtils {
 	}
 	
 	public static String calcPath(String uploadPath) {
-										//C://imgUpload
+									
 		Calendar cal = Calendar.getInstance();
 		String yearPath = Integer.toString(cal.get(Calendar.YEAR));
-// 							year
 		String monthPath = yearPath + "/" + new DecimalFormat("00").format(cal.get(Calendar.MONTH));
-// 							year\\month
 		String datePath = monthPath + "/" + new DecimalFormat("00").format(cal.get(Calendar.DATE));
-//							year\\month\\date
 		log.info("datePath : " + datePath);
 		makeDir(uploadPath,  "/" + yearPath, "/" +  monthPath, "/" + datePath);
 		makeDir(uploadPath,  "/" + yearPath, "/" +  monthPath, "/" + datePath + "\\s");
@@ -59,7 +54,7 @@ public class UploadFileUtils {
 	}
 	
 	private static void makeDir(String uploadPath, String... paths) {
-													//String형의 파라메터를 몇개를 받아도 처리가능.
+													
 		if(new File(paths[paths.length -1]).exists()) {
 			return;
 		}
