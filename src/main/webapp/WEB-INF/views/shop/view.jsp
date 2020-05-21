@@ -58,13 +58,10 @@
 </style>
 <style>
  div.goods div.goodsThumnailImg { float:left; width:350px; }
- div.goods div.goodsThumnailImg img { width:350px; height:auto;
- 									  padding-top : 10px; }
+ div.goods div.goodsThumnailImg img { width:350px; height:auto; padding-top : 10px; }
  
  div.goodsImg { text-align : center; }
- div.goods div.goodsImg p.gdsImg{ padding:10px;
- 									margin-top :10px; 
- 									display : block; }
+ div.goods div.goodsImg p.gdsImg{ padding:10px; margin-top :10px; display : block; }
  
  div.goods div.goodsInfo { float:right; width:330px; font-size:22px; }
  div.goods div.goodsInfo p { margin:0 0 20px 0; }
@@ -103,48 +100,43 @@
 <script src="/resources/jquery/jquery-3.3.1.min.js"></script>
 <head>
 <script>
-									/*Ajax로 하는 이유
-										상품 조회시 이미지가 다수 첨부되어 있어 데이터 소모가 큼
-										댓글 작성을 할때마다 불필요한 데이터 소모가 생김
-										페이지를 새로 읽게 되면 DB에 접속해야함. 동시에 첨부 파일이 있는 저장소에도 접속해야함.
-										필요한 부분만 새로고침 하면 데이터 소모를 최소화 가능
-									*/
-									function replyList(){
-									var gdsNum = ${vo.gdsNum};
-									$.getJSON("/shop/view/replyList" + "?n=" + gdsNum, function(data){
-					//비동기식으로 json 데이터를 가져옴       url을 통해 컨트롤러에 접속하여 데이터를 가져와 function(data) 에 집어넣음.
- 										var str="";
-										$(data).each(function(){
-											console.log(data);
-											
-											var repDate = new Date(this.repDate);
-											repDate = repDate.toLocaleDateString("ko-US");
-																//컨트롤러에서 view로 보낼때의 날짜 데이터 형식이 달라서 1차로 데이터 가공.
-											str+= "<li data-repNum='" + this.repNum + "'>"
-												+ "<div class='userInfo'>"
-												+ "<span class='userName'>" + this.userName + "</span>"
-												+ "<span class='data'>" + repDate + "</span>"
-												+ "</div>"
-												+ "<div class='replyContent'>" + this.repCon + "</div>"
-											
-												+"<c:if test='${member!=null}'>"
-												+ "<div class='replyFooter'>"
-												+ "<button type='button' class='modify' data-repNum='" + this.repNum + "'>수정</button>"
-												+ "<button type='button' class='delete' data-repNum='" + this.repNum + "'>삭제</button>"
-												+ "</div>"
-												+"</c:if>"
-												+ "</li>";
-										});
-										
-										$("section.replyList ol").html(str);
-									});
-									}
-								</script>
+
+	function replyList(){
+	var gdsNum = ${vo.gdsNum};
+	$.getJSON("/shop/view/replyList" + "?n=" + gdsNum, function(data){
+//비동기식으로 json 데이터를 가져옴       url을 통해 컨트롤러에 접속하여 데이터를 가져와 function(data) 에 집어넣음.
+		var str="";
+		$(data).each(function(){
+			console.log(data);
+
+			var repDate = new Date(this.repDate);
+			repDate = repDate.toLocaleDateString("ko-US");
+								//컨트롤러에서 view로 보낼때의 날짜 데이터 형식이 달라서 1차로 데이터 가공.
+			str+= "<li data-repNum='" + this.repNum + "'>"
+				+ "<div class='userInfo'>"
+				+ "<span class='userName'>" + this.userName + "</span>"
+				+ "<span class='data'>" + repDate + "</span>"
+				+ "</div>"
+				+ "<div class='replyContent'>" + this.repCon + "</div>"
+
+				+"<c:if test='${member!=null}'>"
+				+ "<div class='replyFooter'>"
+				+ "<button type='button' class='modify' data-repNum='" + this.repNum + "'>수정</button>"
+				+ "<button type='button' class='delete' data-repNum='" + this.repNum + "'>삭제</button>"
+				+ "</div>"
+				+"</c:if>"
+				+ "</li>";
+		});
+
+		$("section.replyList ol").html(str);
+	});
+	}
+</script>
 </head>
 <body>
 <div id="root">
-	<header id="header">
-		<div id="header_box">
+<header id="header">
+	<div id="header_box">
 			<%@ include file="../include/header.jsp" %>
 		</div>
 	</header>
