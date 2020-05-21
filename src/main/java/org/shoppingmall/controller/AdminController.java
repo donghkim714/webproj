@@ -357,7 +357,7 @@ public class AdminController {
 			int result = 0;
 			try {
 				
-				String setfrom = "rlaehdgud714@gmail.com";
+				String setfrom = "";
 				MimeMessage message = mailSender.createMimeMessage();
 				MimeMessageHelper messageHelper = new MimeMessageHelper(message, true, "UTF-8");
 				//보내는 사람 생략시 작동 x
