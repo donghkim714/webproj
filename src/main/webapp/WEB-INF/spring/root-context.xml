@@ -15,8 +15,8 @@
 		<property name="jdbcUrl"
 		value="jdbc:log4jdbc:oracle:thin:@localhost:1521:orcl">
 		</property>
-		<property name="username" value="c##dongh714"></property>
-		<property name="password" value="kdh7148167!"></property>
+		<property name="username" value=""></property>
+		<property name="password" value=""></property>
 	</bean>
 
 
@@ -34,8 +34,8 @@
 	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
 		<property name="host" value="smtp.gmail.com"/>
 		<property name="port" value="587"/>
-		<property name="username" value="rlaehdgud714@gmail.com"/>
-		<property name="password" value="bossmonster714!@"/>
+		<property name="username" value=""/>
+		<property name="password" value=""/>
 		<property name="javaMailProperties">
 			<props>
 				<prop key="mail.transport.protocol">smtp</prop>
