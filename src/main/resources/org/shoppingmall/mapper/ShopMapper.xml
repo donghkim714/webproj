@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.shoppingmall.mapper.ShopMapper">
+	<select id="list_1" resultType="org.shoppingmall.domain.GoodsViewVO">
+	<![CDATA[
+		select
+            rownum,g.gdsNum, g.gdsName, g.cateCode, c.cateCodeRef, c.cateName, g.gdsPrice, g.gdsStock, g.gdsImg, g.gdsThumnailImg, g.gdsPreDes
+		from(
+            select
+                rownum rn, g.gdsNum, g.gdsName, g.cateCode, c.cateCodeRef, c.cateName, g.gdsPrice, g.gdsStock, g.gdsImg, g.gdsThumnailImg, g.gdsPreDes
+            from
+                 tbl_goods g
+			inner join goods_category c
+				on g.cateCode = c.cateCode
+			where rownum <= #{end} and (g.cateCode = #{cateCode}
+				or c.cateCodeRef = #{cateCodeRef}
+					or c.firstCateCode = #{firstCateCode})
+                        order by g.gdsNum desc
+                    
+        )
+        g inner join goods_category c
+				on g.cateCode = c.cateCode
+			where rn > #{displayPost} and (g.cateCode = #{cateCode}
+				or c.cateCodeRef =  #{cateCodeRef}
+					or c.firstCateCode = #{firstCateCode})
+	]]>
+	</select>
+
+	<select id="list_2" resultType="org.shoppingmall.domain.GoodsViewVO">
+		<![CDATA[
+			select
+			g.gdsNum, g.gdsName, g.cateCode, c.cateCodeRef, c.cateName, g.gdsPrice, g.gdsStock, g.gdsImg, g.gdsThumnailImg, g.gdsPreDes
+		from(
+            select rownum as rn, g.gdsNum, g.gdsName, g.cateCode, c.cateCodeRef, c.cateName, g.gdsPrice, g.gdsStock, g.gdsImg, g.gdsThumnailImg, g.gdsPreDes
+            from
+              tbl_goods g
+			inner join goods_category c
+				on g.cateCode = c.cateCode
+			where rownum <=#{end} and g.cateCode = #{cateCode}
+            order by g.gdsNum desc
+        ) 
+            g
+			inner join goods_category c
+				on g.cateCode = c.cateCode
+			where rn >#{displayPost} and g.cateCode = #{cateCode}
+		]]>
+	</select>
+
+	
+	<select id= "count_1" resultType="int">
+		select count(g.gdsNum)
+		from tbl_goods g
+		inner join goods_category c
+				on g.cateCode = c.cateCode
+			where g.cateCode = #{cateCode}
+				or c.cateCodeRef = #{cateCodeRef}
+					or c.firstCateCode = #{firstCateCode}
+		
+ 	</select>
+ 	<select id= "count_2" resultType="int">
+ 		select
+ 			count(g.gdsNum)
+ 		from tbl_goods g
+			inner join goods_category c
+				on g.cateCode = c.cateCode
+			where g.cateCode = #{cateCode}
+ 	</select>
+ 	
+	<select id="shopView" resultType="org.shoppingmall.domain.GoodsViewVO">
+ 		select
+ 			g.gdsNum, g.gdsName, g.cateCode, c.cateCodeRef, c.cateName, gdsPrice, gdsStock, gdsDes, gdsImg, gdsDate,
+ 			g.gdsImg, g.gdsThumnailImg
+ 		from tbl_goods g
+ 			inner join goods_category c
+ 				on g.cateCode = c.cateCode
+ 			where g.gdsNum = #{gdsNum}
+ 	</select>
+ 	<select id="WarnCheck" resultType="int">
+ 		select userWarn from tbl_member where userId=#{userId}
+ 	</select>
+ 	<insert id="registReply">
+ 		insert into tbl_reply (gdsNum, userId, repNum, repCon)
+ 			values (${gdsNum}, #{userId}, tbl_reply_seq.nextval, #{repCon})
+ 	</insert>
+ 	<select id="replyList" resultType="org.shoppingmall.domain.ReplyListVO">
+ 		select 
+ 			r.gdsNum, r.userId, r.repNum, r.repCon, r.repDate, m.userName
+ 		from tbl_reply r
+ 			inner join tbl_member m
+ 				on r.userId = m.userId
+ 		where gdsNum = #{gdsNum}
+ 	</select>
+ 	
+ 	<delete id="deleteReply">
+ 		delete tbl_reply
+ 			where repNum = #{repNum}
+ 				and userId=#{userId}
+ 	</delete>
+ 	
+ 	<!-- 아이디 체크 -->
+ 	<select id ="replyUserIdCheck" resultType="String">
+ 		select userId
+ 			from tbl_reply
+ 				where repNum = #{repNum}
+ 	</select>
+ 	
+ 	<update id="modifyReply">
+ 		update tbl_reply
+ 			set
+ 				repCon = #{repCon}
+ 			where repNum = #{repNum}
+ 				and userId = #{userId}
+ 	</update>
+ 	
+ 	<insert id="addCart">
+ 		insert into tbl_cart(cartNum, userId, gdsNum, cartStock)
+ 		values (tbl_cart_seq.nextval, #{userId}, #{gdsNum}, #{cartStock})
+ 	</insert>
+ 	
+ 	<select id="cartList" resultType="org.shoppingmall.domain.CartListVO">
+ 		select
+ 			row_number() over(order by c.cartNum desc) as num,
+ 			c.cartNum, c.userId, c.gdsNum, c.cartStock, c.addDate,
+ 			g.gdsName, g.gdsPrice, g.gdsThumnailImg
+ 		from tbl_cart c
+ 			inner join tbl_goods g
+ 				on c.gdsNum = g.gdsNum
+ 			where c.userId = #{userId}
+ 	</select>
+ 	<delete id="deleteCart">
+ 		delete tbl_cart
+ 			where cartNum = #{cartNum}
+ 				and userId = #{userId}
+ 	</delete>
+ 	
+ 	<insert id="orderInfo">
+ 		insert into tbl_order(orderId, userId, orderRec, userAddr1, userAddr2, userAddr3, orderPhon, amount)
+ 		values (#{orderId}, #{userId}, #{orderRec}, #{userAddr1}, #{userAddr2}, #{userAddr3}, #{orderPhon}, #{amount})
+ 	</insert>
+ 	
+ 	<insert id="orderInfoDetails">
+ 		 insert into tbl_order_details(orderDetailsNum, orderId, gdsNum, cartStock)
+     			select tbl_order_details_seq.nextval, #{orderId}, gdsNum, cartStock
+         		from tbl_cart   
+ 	</insert>
+ 	
+ 	<delete id="cartAllDelete">
+ 		delete tbl_cart
+ 			where userId = #{userId}
+ 	</delete>
+ 	
+ 	<select id="orderList" resultType="org.shoppingmall.domain.OrderVO">
+ 		select
+ 			orderId, userId, orderRec, userAddr1, userAddr2, userAddr3, orderPhon, orderDate, delivery, amount
+ 		from tbl_order
+ 			where userId = #{userId}
+ 	</select>
+ 	
+ 	<select id="orderView" resultType="org.shoppingmall.domain.OrderListVO">
+ 		select
+ 			  o.orderId, o.userId, o.orderRec, o.userAddr1, o.userAddr2, o.userAddr3, o.orderPhon, o.amount, o.orderDate, o.delivery,
+     d.orderDetailsNum, d.gdsNum, d.cartStock,
+     g.gdsName, g.gdsThumnailImg, g.gdsPrice
+     from tbl_order o
+     	inner join tbl_order_details d
+     		on o.orderId = d.orderId
+     	inner join tbl_goods g
+     		on d.gdsNum = g.gdsNum
+     	where o.userId = #{userId}
+     		and o.orderId = #{orderId}
+ 	</select>
+ 	
+ 	
+</mapper>

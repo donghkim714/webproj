@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.shoppingmall.mapper.AdminMapper">
+	<select id="category"
+		resultType="org.shoppingmall.domain.CategoryVO">
+		select
+		level, cateName, cateCode, cateCodeRef
+		from
+		goods_category
+		start with cateCodeRef is null connect by prior cateCode=cateCodeRef
+	</select>
+	<insert id="register">
+		insert into tbl_goods
+		(gdsNum, gdsName, cateCode, gdsPrice, gdsStock, gdsDes, gdsPreDes, gdsImg,
+		gdsThumnailImg)
+		values
+		(TBL_GOODS_SEQ.nextval ,#{gdsName}, #{cateCode}, #{gdsPrice}, #{gdsStock}, #{gdsDes},
+		#{gdsPreDes} , #{gdsImg}, #{gdsThumnailImg})
+	</insert>
+
+	<select id="goodsList"
+		resultType="org.shoppingmall.domain.GoodsViewVO">
+ 	<![CDATA[
+ 	select rownum, g.gdsNum, g.gdsName, g.cateCode, c.cateCodeRef, c.cateName, g.gdsPrice, g.gdsStock, g.gdsDes, g.gdsDate, g.gdsPreDes,
+     		g.gdsImg, g.gdsThumnailImg
+     		from(
+			select
+			 	rownum as rn,g.gdsNum, g.gdsName, g.cateCode, c.cateCodeRef, c.cateName, g.gdsPrice, g.gdsStock, g.gdsDes, g.gdsDate, g.gdsPreDes,
+	     		g.gdsImg, g.gdsThumnailImg
+	         from tbl_goods g
+	             inner join goods_category c
+	                 on g.cateCode = c.cateCode
+	                 where rownum <= #{end}
+           ) 
+          	g
+             inner join goods_category c
+                 on g.cateCode = c.cateCode
+                 where rn > #{displayPost}   
+     ]]>
+	</select>
+	<select id= "count" resultType="int">
+		select count(gdsNum)
+		from tbl_goods
+ 	</select>
+
+	<!-- <select id="goodsView" resultType="org.shoppingmall.domain.GoodsVO"> 
+		select gdsNum, gdsName, cateCode, gdsPrice, gdsStock, gdsDes, gdsImg, gdsDate, 
+		gdsPreDes from tbl_goods where gdsNum = #{gdsNum} </select> -->
+
+	<select id="goodsView"
+		resultType="org.shoppingmall.domain.GoodsViewVO">
+		select
+		g.gdsNum, g.gdsName, g.cateCode, c.cateCodeRef, c.cateName, gdsPrice, gdsStock,
+		gdsDes, gdsImg, gdsDate, gdsPreDes,
+		g.gdsImg, g.gdsThumnailImg
+		from tbl_goods g
+		inner join goods_category c
+		on g.cateCode = c.cateCode
+		where g.gdsNum = #{gdsNum}
+	</select>
+	<update id="goodsUpdate">
+		update tbl_goods
+		set
+		gdsName = #{gdsName},
+		gdsPrice = #{gdsPrice},
+		gdsStock = #{gdsStock},
+		gdsDes = #{gdsDes},
+		gdsPreDes = #{gdsPreDes},
+		gdsDate = sysdate,
+
+		gdsImg = #{gdsImg},
+		gdsThumnailImg = #{gdsThumnailImg}
+		where gdsNum = ${gdsNum}
+	</update>
+	<delete id="goodsDelete">
+		delete from tbl_goods
+		where gdsNum = #{gdsNum}
+	</delete>
+
+	<!-- 모든 유저의 주문 목록 -->
+	<select id="orderList"
+		resultType="org.shoppingmall.domain.OrderVO">
+		<![CDATA[
+			select orderId, userId, orderRec, userAddr1, userAddr2, userAddr3,
+					orderPhon, amount, orderDate, delivery
+					from(
+						select
+						rownum as rn,orderId, userId, orderRec, userAddr1, userAddr2, userAddr3,
+						orderPhon, amount, orderDate, delivery
+						from
+						tbl_order
+						where rownum <= #{end}
+						)
+						tbl_order
+						where rn > #{displayPost}
+		]]>
+	</select>
+	<select id="orderCount" resultType="int">
+		select count(orderId)
+		from tbl_order
+	</select>
+
+	<!-- 특정 주문 목록 -->
+	<select id="orderView"
+		resultType="org.shoppingmall.domain.OrderListVO">
+		select
+		o.orderId, o.userId, o.orderRec,
+		o.userAddr1, o.userAddr2, o.userAddr3,
+		o.orderPhon, o.amount, o.orderDate, o.delivery,
+		d.orderDetailsNum, d.gdsNum, d.cartStock,
+		g.gdsName, g.gdsThumnailImg, g.gdsPrice
+		from tbl_order o
+		inner join tbl_order_details d
+		on o.orderId = d.orderId
+		inner join tbl_goods g
+		on d.gdsNum = g.gdsNum
+		where o.orderId = #{orderId}
+	</select>
+	<update id="delivery">
+		update tbl_order
+		set delivery=#{delivery}
+		where orderId = #{orderId}
+	</update>
+
+	<update id="changeStock">
+		update tbl_goods
+		set gdsStock = gdsStock - #{gdsStock}
+		where gdsNum = #{gdsNum}
+	</update>
+
+	<select id="allReply"
+		resultType="org.shoppingmall.domain.ReplyListVO">
+		<![CDATA[
+		select 	r.gdsNum, r.userId, r.repNum, r.repCon, r.repDate, m.userName
+			from(
+			select
+			rownum as rn,r.gdsNum, r.userId, r.repNum, r.repCon, r.repDate,
+			m.userName
+			from tbl_reply r
+			inner join tbl_member m
+			on r.userId = m.userId
+			where rownum <= #{end}
+			)
+			r
+			inner join tbl_member m
+			on r.userId = m.userId
+			where rn > #{displayPost}
+		]]>
+	</select>
+	<select id = "replyCount" resultType="int">
+		select count(repNum)
+		from tbl_reply
+	</select>
+	
+	<delete id="deleteReply">
+		delete tbl_reply
+		where repNum = #{repNum}
+	</delete>
+	
+	<!-- 유저 목록 -->
+	<select id="userList" resultType="org.shoppingmall.domain.MemberVO">
+	<![CDATA[
+		select userId, userName, userPhon, regidate, userEmail, userWarn, verify
+		from (
+			select rownum as rn,userId, userName, userPhon, regidate, userEmail, userWarn,verify
+			from tbl_member
+			where rownum <= #{end}
+			order by regidate desc
+		)
+		tbl_member
+		where rn > #{displayPost}
+	]]>
+	</select>
+	<select id="userCount" resultType="int">
+		select count(userId)
+		from tbl_member
+	</select>
+	
+	 <select id="userView" resultType="org.shoppingmall.domain.UserViewVO">
+	 	select SUM(o.amount) as totalAmount, sum(od.cartStock) as totalStock, m.userWarn
+	 	from 
+        TBL_ORDER_DETAILS od inner join tbl_order o
+            on o.orderId = od.orderId
+            inner join tbl_member m
+	 			on o.userId = m.userId   
+        where m.userId = #{userId} group by m.userWarn
+	 	
+	 </select>
+	 
+	 <delete id="deleteUser">
+	 	delete from tbl_member where userId=#{userId}
+	 </delete> 
+	 
+	 <update id="userModi">
+	 	update tbl_member set userWarn=#{userWarn} where userId=#{userId}
+	 </update>
+	 
+	 <!-- 관리자 첫화면 -->
+	 <select id="adminFirst" resultType="org.shoppingmall.domain.TotalVO">
+	 	select sum(o.amount) as totalPrice, sum(od.cartStock) as totalStock, TO_CHAR(sysdate,'YYYY/MM/DD') as today
+	 	from tbl_order o
+	 	inner join tbl_order_details od
+	 	on o.orderId = od.orderId
+        where 
+        TO_CHAR(o.orderDate) > (select TO_CHAR(sysdate-1,'YY/MM/DD') FROM DUAL)
+	 </select>
+	 <select id="cateTotal" resultType="org.shoppingmall.domain.TotalVO">
+	 	select c.cateName, sum(o.amount) as cateTotalAmount, sum(od.cartStock) as cateTotalStock, TO_CHAR(sysdate,'YYYY/MM/DD') as today
+        from tbl_order o
+        inner join tbl_order_details od
+            on o.orderId = od.orderId
+        inner join tbl_goods g
+            on g.gdsNum = od.gdsNum
+        inner join goods_category c
+            on c.cateCode = g.cateCode
+        where 
+        TO_CHAR(o.orderDate) > (select TO_CHAR(sysdate-1,'YY/MM/DD') FROM DUAL)
+        group by c.cateName
+	 </select>	 
+</mapper>
